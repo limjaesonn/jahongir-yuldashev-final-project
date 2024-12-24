@@ -1,0 +1,51 @@
+import pandas as pd  
+
+def analyze_data():  
+    # Load the dataset (make sure your file path is correct)  
+    df = pd.read_csv('census.csv')  
+
+    # 1. How many people of each race are represented in this dataset?  
+    race_counts = df['race'].value_counts()  
+
+    # 2. What is the average age of men?  
+    average_age_men = df[df['sex'] == 'Male']['age'].mean()  
+
+    # 3. What percentage of people who have a Bachelor's degree?  
+    percentage_bachelors = (df['education'] == 'Bachelors').mean() * 100  
+
+    # 4. What percentage of people with advanced education (Bachelors, Masters, or Doctorate) make more than 50K?  
+    advanced_education = df['education'].isin(['Bachelors', 'Masters', 'Doctorate'])  
+    percentage_advanced_higher_50k = (df[advanced_education]['salary'] == '>50K').mean() * 100  
+
+    # 5. What percentage of people without advanced education make more than 50K?  
+    non_advanced_education = ~advanced_education  
+    percentage_non_advanced_higher_50k = (df[non_advanced_education]['salary'] == '>50K').mean() * 100  
+
+    # 6. What is the minimum number of hours a person works per week?  
+    min_hours_per_week = df['hours-per-week'].min()  
+
+    # 7. What percentage of the people who work the minimum number of hours per week have a salary of more than 50K?  
+    percentage_min_hours_higher_50k = (df[df['hours-per-week'] == min_hours_per_week]['salary'] == '>50K').mean() * 100  
+
+    # 8. What country has the highest percentage of people that earn >50K and what is that percentage?  
+    country_salary_counts = df.groupby('native-country')['salary'].value_counts(normalize=True).unstack()  
+    highest_percentage_country = (country_salary_counts['>50K'] * 100).idxmax()  
+    highest_percentage_value = (country_salary_counts['>50K'] * 100).max()  
+
+    # 9. Identify the most popular occupation for those who earn >50K in India.  
+    india_occupation_counts = df[(df['native-country'] == 'India') & (df['salary'] == '>50K')]['occupation'].value_counts()  
+    most_popular_occupation_india = india_occupation_counts.idxmax()  
+
+    # Print results  
+    print("Race counts:\n", race_counts)  
+    print("Average age of men:", round(average_age_men, 1))  
+    print("Percentage of people with Bachelor’s degree:", round(percentage_bachelors, 1), "%")  
+    print("Percentage of advanced education making >50K:", round(percentage_advanced_higher_50k, 1), "%")  
+    print("Percentage of non-advanced education making >50K:", round(percentage_non_advanced_higher_50k, 1), "%")  
+    print("Minimum hours per week:", min_hours_per_week)  
+    print("Percentage of min hours earning >50K:", round(percentage_min_hours_higher_50k, 1), "%")  
+    print("Country with highest percentage earning >50K:", highest_percentage_country, "with", round(highest_percentage_value, 1), "%")  
+    print("Most popular occupation in India for >50K earners:", most_popular_occupation_india)  
+
+if __name__ == "__main__":  
+    analyze_data()
