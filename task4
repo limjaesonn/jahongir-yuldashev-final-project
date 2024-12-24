@@ -1,0 +1,84 @@
+import pandas as pd  
+import matplotlib.pyplot as plt  
+import seaborn as sns  
+
+# Load the dataset  
+df = pd.read_csv('fcc-forum-pageviews.csv', index_col='date', parse_dates=True)  
+
+# Clean the data: filter out the top and bottom 2.5% of the data  
+lower_limit = df['value'].quantile(0.025)  
+upper_limit = df['value'].quantile(0.975)  
+df = df[(df['value'] >= lower_limit) & (df['value'] <= upper_limit)]  
+
+# Create a copy for future plotting  
+df_copy = df.copy()  
+
+def draw_line_plot():  
+    plt.figure(figsize=(12, 6))  
+    plt.plot(df_copy.index, df_copy['value'], color='blue')  
+    plt.title('Daily freeCodeCamp Forum Page Views 5/2016 - 12/2019', fontsize=16)  
+    plt.xlabel('Date', fontsize=12)  
+    plt.ylabel('Page Views', fontsize=12)  
+    plt.xticks(rotation=45)  
+    plt.tight_layout()  
+    plt.savefig('examples/Figure_1.png')  
+    plt.show()  
+
+def draw_bar_plot():  
+    # Prepare data for the bar plot  
+    df_copy['year'] = df_copy.index.year  
+    df_copy['month'] = df_copy.index.month_name()  
+
+    # Group by year and month, and calculate the average page views  
+    monthly_avg = df_copy.groupby(['year', 'month'])['value'].mean().unstack()  
+
+    plt.figure(figsize=(10, 6))  
+    monthly_avg.plot(kind='bar', legend=True)  
+    plt.title('Average Page Views per Month', fontsize=16)  
+    plt.xlabel('Years', fontsize=12)  
+    plt.ylabel('Average Page Views', fontsize=12)  
+    plt.xticks(rotation=45)  
+    plt.legend(title='Months', fontsize='8')  
+    plt.tight_layout()  
+    plt.savefig('examples/Figure_2.png')  
+    plt.show()  
+
+def draw_box_plot():  
+    # Prepare data for box plots  
+    df_copy['year'] = df_copy.index.year  
+    df_copy['month'] = df_copy.index.month  
+
+    # Create two separate dataframes for year-wise and month-wise  
+    year_data = df_copy[['year', 'value']]  
+    month_data = df_copy[['month', 'value']]  
+    
+    # Remap months for better naming  
+    months_map = {  
+        1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',  
+        7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'  
+    }  
+    month_data['month'] = month_data['month'].map(months_map)  
+
+    plt.figure(figsize=(14, 6))  
+    
+    plt.subplot(1, 2, 1)  # Year-wise box plot  
+    sns.boxplot(x='year', y='value', data=year_data)  
+    plt.title('Year-wise Box Plot (Trend)', fontsize=16)  
+    plt.xlabel('Year', fontsize=12)  
+    plt.ylabel('Page Views', fontsize=12)  
+
+    plt.subplot(1, 2, 2)  # Month-wise box plot  
+    sns.boxplot(x='month', y='value', data=month_data)  
+    plt.title('Month-wise Box Plot (Seasonality)', fontsize=16)  
+    plt.xlabel('Month', fontsize=12)  
+    plt.ylabel('Page Views', fontsize=12)  
+    
+    plt.xticks(rotation=45)  
+    plt.tight_layout()  
+    plt.savefig('examples/Figure_3.png')  
+    plt.show()  
+
+# Call the functions to create plots  
+draw_line_plot()  
+draw_bar_plot()  
+draw_box_plot()
