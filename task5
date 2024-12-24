@@ -1,0 +1,42 @@
+import pandas as pd  
+import matplotlib.pyplot as plt  
+from scipy.stats import linregress  
+
+# Load the dataset  
+df = pd.read_csv('epa-sea-level.csv')  
+
+# Scatter plot of Year vs. CSIRO Adjusted Sea Level  
+plt.figure(figsize=(10, 6))  
+plt.scatter(df['Year'], df['CSIRO Adjusted Sea Level'], color='blue', label='Data Points')  
+
+# Perform linear regression on the full dataset  
+slope, intercept, r_value, p_value, std_err = linregress(df['Year'], df['CSIRO Adjusted Sea Level'])  
+
+# Create a line of best fit for the full dataset  
+years_extended = pd.Series(range(1880, 2051))  # years from 1880 to 2050  
+sea_level_fit = slope * years_extended + intercept  
+plt.plot(years_extended, sea_level_fit, color='red', label='Fit Line (All Data)')  
+
+# Predict sea level rise in 2050 using the line of best fit  
+predicted_sea_level_2050 = slope * 2050 + intercept  
+plt.scatter(2050, predicted_sea_level_2050, color='green', label='Predicted Sea Level in 2050')  
+
+# Plot a line of best fit for data from year 2000 onwards  
+df_recent = df[df['Year'] >= 2000]  
+slope_recent, intercept_recent, _, _, _ = linregress(df_recent['Year'], df_recent['CSIRO Adjusted Sea Level'])  
+
+# Create a line of best fit for the recent years  
+years_recent = pd.Series(range(2000, 2051))  # years from 2000 to 2050  
+sea_level_fit_recent = slope_recent * years_recent + intercept_recent  
+plt.plot(years_recent, sea_level_fit_recent, color='orange', label='Fit Line (2000 Onwards)')  
+
+# Final plot adjustments  
+plt.title('Rise in Sea Level', fontsize=16)  
+plt.xlabel('Year', fontsize=12)  
+plt.ylabel('Sea Level (inches)', fontsize=12)  
+plt.legend()  
+plt.grid()  
+
+# Save and show the plot  
+plt.savefig('sea_level_plot.png')  
+plt.show()
