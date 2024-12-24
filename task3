@@ -1,0 +1,8 @@
+import pandas as pd  
+import matplotlib.pyplot as plt  
+
+# Load the dataset (ensure the path is correct)  
+df = pd.read_csv('medical_data.csv')  
+
+# 1. Check the first few rows of the dataframe to understand its structure  
+print("
